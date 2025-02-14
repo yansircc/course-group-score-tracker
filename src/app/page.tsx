@@ -52,7 +52,7 @@ function HomePage() {
   async function handleAddGroups() {
     const newGroups = Array.from({ length: numGroups }, (_, index) => ({
       id: `group-${index + 1}`,
-      name: `Group ${index + 1}`,
+      name: `小组 ${index + 1}`,
       description: "",
       score: 0,
     }));
@@ -105,7 +105,7 @@ function HomePage() {
             <div className="space-y-2">
               <h1 className="text-4xl font-bold">颜sir线下课小组赛</h1>
               <p className="text-muted-foreground">
-                Track and compare group performance in real-time
+                实时跟踪，小组PK，小组最高分展示
               </p>
             </div>
 
@@ -121,7 +121,7 @@ function HomePage() {
                     className="gap-2 border-primary/20 transition-all hover:border-primary hover:bg-primary/10"
                   >
                     <Edit2 className="h-4 w-4" />
-                    {editMode ? "Done" : "Edit Groups"}
+                    {editMode ? "完成" : "编辑小组"}
                   </Button>
                 </motion.div>
 
@@ -134,7 +134,7 @@ function HomePage() {
                     onClick={() => setIsResetDialogOpen(true)}
                     className="gap-2"
                   >
-                    Reset All Data
+                    重置所有数据
                   </Button>
                 </motion.div>
               </div>
@@ -162,7 +162,7 @@ function HomePage() {
                   >
                     <div className="mb-6 flex items-center justify-between">
                       <h2 className="text-xl font-semibold text-primary">
-                        Groups
+                        小组
                       </h2>
                       <motion.div
                         animate={{ rotate: [0, 5, 0] }}

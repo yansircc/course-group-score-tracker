@@ -27,9 +27,7 @@ export function ScoreChart({ data }: ScoreChartProps) {
       animate={{ opacity: 1, y: 0 }}
       className="rounded-xl border border-primary/20 bg-card/50 p-6 backdrop-blur"
     >
-      <h2 className="mb-6 text-xl font-semibold text-primary">
-        Score Comparison
-      </h2>
+      <h2 className="mb-6 text-xl font-semibold text-primary">分数PK</h2>
       <div className="h-[600px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data}>

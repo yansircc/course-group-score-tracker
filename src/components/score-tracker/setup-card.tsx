@@ -29,7 +29,7 @@ export function SetupCard({
         <CardContent className="space-y-6 p-8">
           <div className="space-y-4">
             <Label htmlFor="numGroups" className="text-lg">
-              How many groups do you want to create?
+              想创建多少个组？
             </Label>
             <Input
               id="numGroups"
@@ -42,7 +42,7 @@ export function SetupCard({
             />
           </div>
           <Button onClick={onCreateGroups} className="w-full" size="lg">
-            Create Groups
+            创建
           </Button>
         </CardContent>
       </Card>
