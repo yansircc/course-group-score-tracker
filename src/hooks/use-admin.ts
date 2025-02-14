@@ -1,4 +1,6 @@
-import { useEffect, useState, useCallback } from "react";
+"use client";
+
+import { useEffect, useState, useCallback, useTransition } from "react";
 import { useSearchParams } from "next/navigation";
 
 function generateClientId() {
@@ -9,6 +11,7 @@ export function useAdmin() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
 
   // Add reset function
   const resetAll = useCallback(async () => {
@@ -26,12 +29,9 @@ export function useAdmin() {
       };
 
       if (data.success) {
-        // Clear local storage
         localStorage.removeItem("isAdmin");
         localStorage.removeItem("clientId");
-        // Reset admin state
         setIsAdmin(false);
-        // Reload the page to reset all state
         window.location.reload();
       } else {
         console.error("Failed to reset:", data.message);
@@ -42,50 +42,52 @@ export function useAdmin() {
   }, [isAdmin]);
 
   useEffect(() => {
-    async function checkAdminStatus() {
-      try {
-        // Get or create clientId
-        let clientId = localStorage.getItem("clientId");
-        if (!clientId) {
-          clientId = generateClientId();
-          localStorage.setItem("clientId", clientId);
-        }
+    startTransition(() => {
+      async function checkAdminStatus() {
+        try {
+          let clientId = localStorage.getItem("clientId");
+          if (!clientId) {
+            clientId = generateClientId();
+            localStorage.setItem("clientId", clientId);
+          }
 
-        // Check if user parameter is admin
-        const isAdminParam = searchParams.get("user") === "admin";
+          const isAdminParam = searchParams.get("user") === "admin";
 
-        if (isAdminParam) {
-          // Register as admin
-          await fetch("/api/admin/check", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ clientId }),
-          });
-          localStorage.setItem("isAdmin", "true");
-          setIsAdmin(true);
-        } else {
-          // Check existing admin status
-          const storedIsAdmin = localStorage.getItem("isAdmin") === "true";
-          if (storedIsAdmin) {
-            const response = await fetch(
-              `/api/admin/check?clientId=${clientId}`,
-            );
-            const data = (await response.json()) as { isAdmin: boolean };
-            setIsAdmin(data.isAdmin);
-            if (!data.isAdmin) {
-              localStorage.removeItem("isAdmin");
+          if (isAdminParam) {
+            await fetch("/api/admin/check", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ clientId }),
+            });
+            localStorage.setItem("isAdmin", "true");
+            setIsAdmin(true);
+          } else {
+            const storedIsAdmin = localStorage.getItem("isAdmin") === "true";
+            if (storedIsAdmin) {
+              const response = await fetch(
+                `/api/admin/check?clientId=${clientId}`,
+              );
+              const data = (await response.json()) as { isAdmin: boolean };
+              setIsAdmin(data.isAdmin);
+              if (!data.isAdmin) {
+                localStorage.removeItem("isAdmin");
+              }
             }
           }
+        } catch (error) {
+          console.error("Failed to check admin status:", error);
+        } finally {
+          setIsLoading(false);
         }
-      } catch (error) {
-        console.error("Failed to check admin status:", error);
-      } finally {
-        setIsLoading(false);
       }
-    }
 
-    void checkAdminStatus();
+      void checkAdminStatus();
+    });
   }, [searchParams]);
 
-  return { isAdmin, isLoading, resetAll };
+  return {
+    isAdmin,
+    isLoading: isLoading || isPending,
+    resetAll,
+  };
 }

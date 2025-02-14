@@ -7,7 +7,7 @@ import { GroupCard } from "@/components/score-tracker/group-card";
 import { ScoreChart } from "@/components/score-tracker/score-chart";
 import { SetupCard } from "@/components/score-tracker/setup-card";
 import { useScoreStore } from "@/store/score-store";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useAdmin } from "@/hooks/use-admin";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
@@ -25,7 +25,7 @@ const groupColors = [
   { accent: "bg-teal-500", chart: "rgb(20, 184, 166)" }, // Teal
 ] as const;
 
-export default function HomePage() {
+function HomePage() {
   const { isAdmin, isLoading: isAdminLoading, resetAll } = useAdmin();
   const {
     groups,
@@ -214,5 +214,20 @@ export default function HomePage() {
         onConfirm={resetAll}
       />
     </main>
+  );
+}
+
+// Export the wrapped component as default
+export default function Page() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-screen items-center justify-center">
+          <div className="text-muted-foreground">Loading...</div>
+        </div>
+      }
+    >
+      <HomePage />
+    </Suspense>
   );
 }
